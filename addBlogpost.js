@@ -18,28 +18,23 @@ MongoClient.connect(url, function(err, db) {
 //   console.log(body);
 
 	var blogpost = {
-		title: "How To: Install HTK On Ubuntu 17.04", // Plaintext
-		date: "1511092800", // Unixtime (seconds)
+		title: "If zachhuxford.io Is So Good, Why Isn't There a zachhuxford.io 2?", // Plaintext
+		date: "1535854325", // Unixtime (seconds)
 		postID: 1,
-		urlTitle: "How_To_Install_HTK_On_Ubuntu_17.04",
+		urlTitle: "If_zachhuxford.io_Is_So_Good_Why_Isnt_There_a_zachhuxford.io_2",
 		author: {
 			name: "Zach Huxford",
 			authorID: "0"
 		},
 		tags: [
-			"HTK",
-			"Ubuntu",
-			"Ubuntu17.04",
-			"linux",
-			"HowTo",
-			"install",
-			"rant",
-			"tatai",
-			"softeng206",
-			"UoA",
-			"UniversityOfAuckland",
-			"SoftwareEngineering",
-			"SE"
+			"webdev",
+			"react",
+			"reactjs",
+			"mongo",
+			"mongodb",
+			"node",
+			"nodejs",
+			"blog"
 		],
 		/*
 			handlebars will be used to inject the image links into the body
@@ -47,7 +42,7 @@ MongoClient.connect(url, function(err, db) {
 			if a thumbnail doesn't exist, the first image will be used by default
 		*/
 		images: {
-			questionScreen: "https://s3-ap-southeast-2.amazonaws.com/blog-zachhuxford-io/blog/posts/1-HOW-TO-Install-HTK-on-Ubuntu-17.04/question_screen.png"
+			oldHomePage: "https://s3-ap-southeast-2.amazonaws.com/blog-zachhuxford-io/blog/posts/2-If_zachhuxford.io_Is_So_Good_Why_Isnt_There_a_zachhuxford.io_2/Screenshot+from+2018-09-02+17-15-55.png"
 		},
 		body: body, // InnerHTML
 		disqusID: "1511044085"
@@ -89,6 +84,7 @@ var getNewBlogpostID = function(db, blogpost, callback) {
 
 var insertBlogpost = function(db, blogpost, latestPostID, callback) {
 	blogpost.postID = latestPostID + 1;
+	blogpost.disqusID = blogpost.postID;
 
 	var collection = db.collection('blogposts');
 	collection.insertMany([

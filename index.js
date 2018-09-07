@@ -1,3 +1,4 @@
+#!/usr/bin/env nodejs
 var config = require('./config'),
     MongoClient = require('mongodb').MongoClient,
     assert = require('assert'),

@@ -61,6 +61,11 @@ io.on('connection', function (socket) {
     });
 });
 
+lastfm.pollMyRecentTrack(function(recentTrack) {
+    console.log(recentTrack);
+    io.of("/lastfm").emit("recent-track-update", JSON.stringify(recentTrack));
+});
+
 var getAuthor = function (req, res) {
     var authorID = parseInt(req.params.authorID);
     MongoClient.connect(config.mongodb.url, function (err, db) {

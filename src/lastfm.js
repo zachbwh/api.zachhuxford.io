@@ -68,6 +68,21 @@ var lastfm = {
                 res.status(200).json(recentTrack);
             }
         });
+    },
+    pollMyRecentTrack: function(callback) {
+        var queryString = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${config.lastfm.username}&api_key=${config.lastfm.apiKey}&format=json&limit=1`;
+        setInterval(function() {
+            request(queryString, function(err, response, body) {
+                if (response.statusCode === 200) {
+                    var recentTrack = JSON.parse(body);
+                    recentTrack = recentTrack.recenttracks.track[0];
+                    if (callback) {
+                        callback(recentTrack);
+                    }
+                }
+            });
+        }, 5000);
+        
     }
 }
 

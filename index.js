@@ -7,7 +7,7 @@ var config = require('./config'),
     http = require('http').createServer(app),
     io = require('socket.io')(http),
     posts = require('./src/posts'),
-    lastfm = require('./src/lastfm');
+    LastFmController = require('./src/lastfm');
 
 // Allow CORS
 app.use(function (req, res, next) {
@@ -21,9 +21,9 @@ if (config.devMode) {
     app.get('/', (req, res) => res.send('Hello World!'))
 }
 
-http.listen(config.express.port, function(){
+http.listen(config.express.port, function () {
     console.log(`listening on *:${config.express.port}`);
-  });
+});
 
 app.get('/posts/', function (req, res) {
     posts.getAllPosts(req, res)
@@ -46,11 +46,11 @@ app.get('/authors/:authorID', function (req, res) {
 });
 
 app.get('/lastfm/getFriends', function (req, res) {
-    lastfm.getFriendsInfoAndRecentTracks(req, res);
+    LastFmController.getFriendsInfoAndRecentTracks(req, res);
 });
 
 app.get('/lastfm/getMyRecentTrack', function (req, res) {
-    lastfm.getMyRecentTrack(req, res);
+    LastFmController.getMyRecentTrack(req, res);
 });
 
 io.on('connection', function (socket) {
@@ -61,9 +61,25 @@ io.on('connection', function (socket) {
     });
 });
 
-lastfm.pollMyRecentTrack(function(recentTrack) {
-    console.log(recentTrack);
-    io.of("/lastfm").emit("recent-track-update", JSON.stringify(recentTrack));
+var LastFmController = new LastFmController({
+    pollMyRecentTrackCb: function (recentTrack) {
+        var shouldNotifyListeners = false;
+        // Listeners should only be updated if there is a change to the most recent track
+        if (!this.myRecentTrack) {
+            shouldNotifyListeners = true;
+        } else if (JSON.stringify(this.myRecentTrack) !== JSON.stringify(recentTrack)) {
+            shouldNotifyListeners = true;
+        }
+
+        if (shouldNotifyListeners) {
+            this.myRecentTrack = recentTrack;
+            console.log("notifying listeners of recent track change");
+            io.of("/lastfm").emit("recent-track-update", JSON.stringify(recentTrack));
+        }
+    },
+    pollFriendsRecentTracksCb: function(friendRecentTrack) {
+
+    }
 });
 
 var getAuthor = function (req, res) {

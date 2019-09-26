@@ -2,8 +2,15 @@ var config = require('../config'),
     request = require('request'),
 	async = require('async');
 
-var lastfm = {
-    getFriendsInfoAndRecentTracks: function(req, res) {
+class LastFmController {
+    constructor(options) {
+        this.pollMyRecentTrackCb = options.pollMyRecentTrackCb;
+        this.pollMyRecentTrack();
+
+        this.friendsRecentTracks = {};
+    }
+
+    getFriendsInfoAndRecentTracks(req, res) {
         var getFriendsQueryString = `https://ws.audioscrobbler.com/2.0/?method=user.getfriends&user=${config.lastfm.username}&api_key=${config.lastfm.apiKey}&format=json`;
         request(getFriendsQueryString, function(err, response, body) {
             if (response.statusCode === 200) {
@@ -58,8 +65,9 @@ var lastfm = {
                 });
             }
         });
-    },
-    getMyRecentTrack: function(req, res) {
+    }
+
+    getMyRecentTrack(req, res) {
         var queryString = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${config.lastfm.username}&api_key=${config.lastfm.apiKey}&format=json&limit=1`;
         request(queryString, function(err, response, body) {
             if (response.statusCode === 200) {
@@ -68,22 +76,23 @@ var lastfm = {
                 res.status(200).json(recentTrack);
             }
         });
-    },
-    pollMyRecentTrack: function(callback) {
+    }
+
+    pollMyRecentTrack() {
+        var that = this;
         var queryString = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${config.lastfm.username}&api_key=${config.lastfm.apiKey}&format=json&limit=1`;
         setInterval(function() {
             request(queryString, function(err, response, body) {
                 if (response.statusCode === 200) {
                     var recentTrack = JSON.parse(body);
                     recentTrack = recentTrack.recenttracks.track[0];
-                    if (callback) {
-                        callback(recentTrack);
+                    if (typeof that.pollMyRecentTrackCb === "function") {
+                        that.pollMyRecentTrackCb.call(that, recentTrack);
                     }
                 }
             });
         }, 5000);
-        
     }
 }
 
-module.exports = lastfm;
+module.exports = LastFmController;

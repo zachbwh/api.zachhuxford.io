@@ -4,3 +4,6 @@ node_js:
 cache:
   directories:
   - node_modules
+before_install:
+- openssl aes-256-cbc -K $encrypted_4752afa95b8a_key -iv $encrypted_4752afa95b8a_iv
+  -in travis_rsa.enc -out travis_rsa -d

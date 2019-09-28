@@ -62,23 +62,35 @@ io.on('connection', function (socket) {
 });
 
 var LastFmController = new LastFmController({
-    pollMyRecentTrackCb: function (recentTrack) {
+    pollRecentTrackCb: function (recentTrack, username) {
         var shouldNotifyListeners = false;
         // Listeners should only be updated if there is a change to the most recent track
-        if (!this.myRecentTrack) {
+        if (!this.recentTracks[username]) {
             shouldNotifyListeners = true;
-        } else if (JSON.stringify(this.myRecentTrack) !== JSON.stringify(recentTrack)) {
+        } else if (JSON.stringify(this.recentTracks[username]) !== JSON.stringify(recentTrack)) {
             shouldNotifyListeners = true;
         }
 
         if (shouldNotifyListeners) {
-            this.myRecentTrack = recentTrack;
+            this.recentTracks[username] = recentTrack;
             console.log("notifying listeners of recent track change");
             io.of("/lastfm").emit("recent-track-update", JSON.stringify(recentTrack));
         }
     },
-    pollFriendsRecentTracksCb: function(friendRecentTrack) {
+    pollFriendsRecentTracksCb: function(username, friendRecentTrack) {
+        var shouldNotifyListeners = false;
+        
+        if (!this.recentTracks[username]) {
+            shouldNotifyListeners = true;
+        } else if (JSON.stringify(this.recentTracks[username]) !== JSON.stringify(friendRecentTrack)) {
+            shouldNotifyListeners = true;
+        }
 
+        if (shouldNotifyListeners) {
+            this.recentTracks[username] = friendRecentTrack;
+            console.log(`notifying listeners of ${username}'s recent track change`);
+            io.of("/lastfmcreep").emit("recent-track-update", JSON.stringify(friendRecentTrack));
+        }
     }
 });
 

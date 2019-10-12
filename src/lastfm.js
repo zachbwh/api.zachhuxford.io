@@ -157,19 +157,6 @@ class LastFmController {
                 }
             });
         }
-        
-        /* Sorting list should now be a clientside behaviour as the socket server will only be pushing changes to recent tracks not the whole list
-            friendsList = friendsList.sort(function(a, b) {
-                if (a.recenttrack['@attr'] && a.recenttrack['@attr'].nowplaying && (!b.recenttrack['@attr'] || !b.recenttrack['@attr'].nowplaying)) {
-                    return -1;
-                } else if ((!a.recenttrack['@attr']  || !a.recenttrack['@attr'].nowplaying) && b.recenttrack['@attr'] && b.recenttrack['@attr'].nowplaying) {
-                    return 1;
-                } else if (a.recenttrack['@attr'] && a.recenttrack['@attr'].nowplaying && b.recenttrack['@attr'] && b.recenttrack['@attr'].nowplaying) {
-                    return 0;
-                }
-                return a.recenttrack.date.uts < b.recenttrack.date.uts ? 1 : a.recenttrack.date.uts > b.recenttrack.date.uts ? -1 : 0;
-            });
-            */
     }
 
     pollFriendsRecentTracks() {

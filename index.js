@@ -18,7 +18,7 @@ app.use(function (req, res, next) {
 
 
 if (config.devMode) {
-    app.get('/', (req, res) => res.send('Hello World!'))
+    app.get('/', (req, res) => res.send('The World Is Changing!'))
 }
 
 http.listen(config.express.port, function () {
@@ -53,14 +53,6 @@ app.get('/lastfm/getMyRecentTrack', function (req, res) {
     LastFmController.getMyRecentTrack(req, res);
 });
 
-io.on('connection', function (socket) {
-    console.log('a user connected');
-    io.emit("connected", "A User Connected");
-    socket.on('disconnect', function () {
-        console.log('user disconnected');
-    });
-});
-
 var LastFmController = new LastFmController({
     pollRecentTrackCb: function (recentTrack, username) {
         var shouldNotifyListeners = false;
@@ -93,6 +85,15 @@ var LastFmController = new LastFmController({
         }
     }
 });
+
+io.on('connection', function (socket) {
+    console.log('a user connected');
+    io.emit("connected", "A User Connected");
+    socket.on('disconnect', function () {
+        console.log('user disconnected');
+    });
+});
+io.origins('*:*')
 
 var getAuthor = function (req, res) {
     var authorID = parseInt(req.params.authorID);

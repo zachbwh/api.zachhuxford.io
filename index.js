@@ -45,14 +45,6 @@ app.get('/authors/:authorID', function (req, res) {
     getAuthor(req, res);
 });
 
-app.get('/lastfm/getFriends', function (req, res) {
-    LastFmController.getFriendsInfoAndRecentTracks(req, res);
-});
-
-app.get('/lastfm/getMyRecentTrack', function (req, res) {
-    LastFmController.getMyRecentTrack(req, res);
-});
-
 var LastFmController = new LastFmController({
     pollRecentTrackCb: function (recentTrack, username) {
         var shouldNotifyListeners = false;
@@ -93,6 +85,21 @@ io.on('connection', function (socket) {
         console.log('user disconnected');
     });
 });
+
+io.of("/lastfm").on('connection', function (socket) {
+    console.log('a user connected to the music page');
+    
+    var myRecentTrack = LastFmController.loadMyRecentTrack();
+    socket.emit("load-my-recent-track", JSON.stringify(myRecentTrack));
+});
+
+io.of("/lastfmcreep").on('connection', function (socket) {
+    console.log('a user connected to the creep');
+
+    var friendRecentTracks = LastFmController.loadFriendRecentTracks();
+    socket.emit("load-friend-recent-tracks", JSON.stringify(friendRecentTracks));
+});
+
 io.origins('*:*')
 
 var getAuthor = function (req, res) {

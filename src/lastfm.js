@@ -49,30 +49,8 @@ class LastFmController {
         });
     }
 
-    getFriendsInfoAndRecentTracks(req, res) {
-        var that = this;
-        this.getFriendsList(config.lastfm.username, function(err, data) {
-            if (err) {
-                return res.status(500).send(err);
-            }
-            that.getFriendsRecentTracks(false, null, null, function(err, friendRecentTracks) {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).send(err);
-                }
-                return res.status(200).json(friendRecentTracks);
-            })
-        });
-    }
-
-    getMyRecentTrack(req, res) {
-        this.getRecentTrack(config.lastfm.username, function(err, username, recentTrack) {
-            if (err) {
-                console.log(err);
-                res.status(500).send(err);
-            }
-            res.status(200).json(recentTrack);
-        });
+    loadMyRecentTrack() {
+        return Object.values(this.recentTracks).filter(recentTrack => typeof recentTrack.recenttrack === "undefined")[0];
     }
 
     getRecentTrack(username, cb) {
@@ -138,25 +116,18 @@ class LastFmController {
         });
 
         // 5 is only kinda a magic number to prevent the  API rate limiting from kicking in
-        if (isPolling) {
-            async.series(getRecentTrackTasks, function(err, data) {
-                if (cb && typeof cb === "function") {
-                    if (err) {
-                        return cb(err);
-                    }
-                     return cb(null, data);
+        async.parallelLimit(getRecentTrackTasks, 5, function(err, data) {
+            if (cb && typeof cb === "function") {
+                if (err) {
+                    return cb(err);
                 }
-            });
-        } else {
-            async.parallelLimit(getRecentTrackTasks, 5, function(err, data) {
-                if (cb && typeof cb === "function") {
-                    if (err) {
-                        return cb(err);
-                    }
-                     return cb(null, data);
-                }
-            });
-        }
+                 return cb(null, data);
+            }
+        });
+    }
+
+    loadFriendRecentTracks() {
+        return Object.values(this.recentTracks).filter(recentTrack => typeof recentTrack.recenttrack !== "undefined");
     }
 
     pollFriendsRecentTracks() {

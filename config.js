@@ -5,7 +5,11 @@ config = {
     express: {
         port: 3001
     },
-    devMode: true
+    devMode: true,
+    lastfm: {
+        apiKey: "$lastfm_api_key",
+        username: "zachbwh"
+    }
 }
 
 module.exports = config;

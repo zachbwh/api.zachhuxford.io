@@ -115,8 +115,8 @@ class LastFmController {
             getRecentTrackTasks.push(getRecentTrackTask.bind(null, friend));
         });
 
-        // 5 is only kinda a magic number to prevent the  API rate limiting from kicking in
-        async.parallelLimit(getRecentTrackTasks, 5, function(err, data) {
+        // 3 is only kinda a magic number to prevent the  API rate limiting from kicking in
+        async.parallelLimit(getRecentTrackTasks, 3, function(err, data) {
             if (cb && typeof cb === "function") {
                 if (err) {
                     return cb(err);

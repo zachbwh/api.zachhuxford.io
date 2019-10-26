@@ -11,7 +11,7 @@ class LastFmController {
         this.pollFriendsRecentTracksCb = options.pollFriendsRecentTracksCb.bind(this);
         this.getFriendsList(config.lastfm.username, function(err) {
             if (err) {
-
+                throw new Error(err);
             }
             that.pollFriendsRecentTracks();
         });
@@ -115,8 +115,8 @@ class LastFmController {
             getRecentTrackTasks.push(getRecentTrackTask.bind(null, friend));
         });
 
-        // 5 is only kinda a magic number to prevent the  API rate limiting from kicking in
-        async.parallelLimit(getRecentTrackTasks, 5, function(err, data) {
+        // 4 is only kinda a magic number to prevent the  API rate limiting from kicking in
+        async.parallelLimit(getRecentTrackTasks, 4, function(err, data) {
             if (cb && typeof cb === "function") {
                 if (err) {
                     return cb(err);

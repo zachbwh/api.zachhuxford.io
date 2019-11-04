@@ -88,16 +88,26 @@ io.on('connection', function (socket) {
 
 io.of("/lastfm").on('connection', function (socket) {
     console.log('a user connected to the music page');
-    
+
+    LastFmController.websocketListeners++;
     var myRecentTrack = LastFmController.loadMyRecentTrack();
     socket.emit("load-my-recent-track", JSON.stringify(myRecentTrack));
+
+    socket.on('disconnect', (reason) => {
+        LastFmController.websocketListeners--;
+    });
 });
 
 io.of("/lastfmcreep").on('connection', function (socket) {
     console.log('a user connected to the creep');
 
+    LastFmController.websocketListeners++;
     var friendRecentTracks = LastFmController.loadFriendRecentTracks();
     socket.emit("load-friend-recent-tracks", JSON.stringify(friendRecentTracks));
+
+    socket.on('disconnect', (reason) => {
+        LastFmController.websocketListeners--;
+    });
 });
 
 io.origins('*:*')

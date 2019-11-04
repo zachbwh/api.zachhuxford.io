@@ -16,6 +16,7 @@ class LastFmController {
             that.pollFriendsRecentTracks();
         });
         this.recentTracks = {};
+        this.websocketListeners = 0;
     }
 
     getFriendsList(username, cb) {
@@ -115,15 +116,29 @@ class LastFmController {
             getRecentTrackTasks.push(getRecentTrackTask.bind(null, friend));
         });
 
-        // 4 is only kinda a magic number to prevent the  API rate limiting from kicking in
-        async.parallelLimit(getRecentTrackTasks, 4, function(err, data) {
-            if (cb && typeof cb === "function") {
-                if (err) {
-                    return cb(err);
+        if (this.websocketListeners > 0) {
+            // 4 is only kinda a magic number to prevent the  API rate limiting from kicking in
+            async.parallelLimit(getRecentTrackTasks, 4, function(err, data) {
+                if (cb && typeof cb === "function") {
+                    if (err) {
+                        return cb(err);
+                    }
+                    return cb(null, data);
                 }
-                 return cb(null, data);
-            }
-        });
+            });
+        } else {
+            // To avoid rate limiting, only poll one at a time with a 20 sec wait between bursts if there are no current listeners
+            setTimeout(function() {
+                async.parallelLimit(getRecentTrackTasks, 1, function(err, data) {
+                    if (cb && typeof cb === "function") {
+                        if (err) {
+                            return cb(err);
+                        }
+                        return cb(null, data);
+                    }
+                });
+            }, 20000);
+        }
     }
 
     loadFriendRecentTracks() {

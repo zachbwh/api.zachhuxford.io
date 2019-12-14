@@ -112,7 +112,7 @@ io.of("/lastfmcreep").on('connection', function (socket) {
 
 io.origins('*:*')
 
-app.get('/top-albums/', LastFmController.getMyTopAlbums.bind(LastFmController))
+app.get('/topAlbums/', LastFmController.getMyTopAlbums.bind(LastFmController))
 
 var getAuthor = function (req, res) {
     var authorID = parseInt(req.params.authorID);

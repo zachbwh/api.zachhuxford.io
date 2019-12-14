@@ -7,6 +7,7 @@ class LastFmController {
         var that = this;
         this.pollRecentTrackCb = options.pollRecentTrackCb.bind(this);
         this.pollMyRecentTrack();
+        this.pollMyTopAlbums();
 
         this.pollFriendsRecentTracksCb = options.pollFriendsRecentTracksCb.bind(this);
         this.getFriendsList(config.lastfm.username, function(err) {
@@ -165,6 +166,55 @@ class LastFmController {
             console.log("queue experienced the error: ", err);
             that.queue.push({}, pushToQueue);
         });
+    }
+
+    getTopAlbums(username, cb) {
+        var queryString = `https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=${username}&api_key=${config.lastfm.apiKey}&format=json&period=3month`;
+        request(queryString, function(err, response, body) {
+            if (err) {
+                return cb(err, username);
+            }
+            var body = JSON.parse(body);
+            if (body.error) {
+                console.log(body.message);
+                return cb(body.message, username);
+            }
+            if (response.statusCode === 200) {
+                var topAlbums = body.topalbums.album;
+
+                topAlbums.forEach(function(album) {
+                    album.artist = album.artist.name;
+                    delete album["@attr"];
+                    delete album.url;
+                    delete album.mbid;
+                    album.image = album.image.filter(image => image.size === "large" || image.size === "extralarge");
+                });
+
+                return cb(null, username, topAlbums)
+            } else {
+                return cb(response.statusMessage, username)
+            }
+        });
+    }
+
+    getMyTopAlbums(req, res) {
+        res.json(this.myTopAlbums);
+    }
+
+    pollMyTopAlbums() {
+        var that = this;
+        this.getTopAlbums(config.lastfm.username, function(err, username, topAlbums) {
+            if (!err) {
+                that.myTopAlbums = topAlbums;
+            }
+        });
+        setInterval(function() {
+            that.getTopAlbums(config.lastfm.username, function(err, username, topAlbums) {
+                if (!err) {
+                    that.myTopAlbums = topAlbums;
+                }
+            });
+        }, 2592000000); // Interval is every month
     }
 }
 

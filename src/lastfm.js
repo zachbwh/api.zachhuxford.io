@@ -203,11 +203,13 @@ class LastFmController {
 
     pollMyTopAlbums() {
         var that = this;
-        setTimeout(that.getTopAlbums(config.lastfm.username, function(err, username, topAlbums) {
-            if (!err) {
-                that.myTopAlbums = topAlbums;
-            }
-        }), 300000); // set timeout to avoid rate limiting during initial load
+        setTimeout(function() {
+            that.getTopAlbums(config.lastfm.username, function(err, username, topAlbums) {
+                if (!err) {
+                    that.myTopAlbums = topAlbums;
+                }
+            });
+        }, 300000); // set timeout to avoid rate limiting during initial load
         setInterval(function() {
             that.getTopAlbums(config.lastfm.username, function(err, username, topAlbums) {
                 if (!err) {

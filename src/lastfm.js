@@ -63,7 +63,9 @@ class LastFmController {
             }
             var body = JSON.parse(body);
             if (body.error) {
-                console.log(body.message);
+                if (config.devMode) {
+                    console.log(body.message);
+                }
                 return cb(body.message, username);
             }
             if (response.statusCode === 200) {
@@ -176,7 +178,9 @@ class LastFmController {
             }
             var body = JSON.parse(body);
             if (body.error) {
-                console.log(body.message);
+                if (config.devMode) {
+                    console.log(body.message);
+                }
                 return cb(body.message, username);
             }
             if (response.statusCode === 200) {
@@ -216,7 +220,7 @@ class LastFmController {
                     that.myTopAlbums = topAlbums;
                 }
             });
-        }, 2592000000); // Interval is every month
+        }, 259200000); // Interval is every month
     }
 }
 

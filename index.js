@@ -18,7 +18,7 @@ app.use(function (req, res, next) {
 
 
 if (config.devMode) {
-    app.get('/', (req, res) => res.send('The World Is Changing Back!'))
+    app.get('/', (req, res) => res.send('The World Is Changing Back And Hopefully Deploying Correctly?!'))
 }
 
 http.listen(config.express.port, function () {

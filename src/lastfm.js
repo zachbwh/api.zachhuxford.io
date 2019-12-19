@@ -202,7 +202,11 @@ class LastFmController {
     }
 
     getMyTopAlbums(req, res) {
-        res.json(this.myTopAlbums);
+        if (this.myTopAlbums && this.myTopAlbums.length > 0) {
+            res.json(this.myTopAlbums);
+        } else {
+            res.json({error: "No top albums cached yet"});
+        }
     }
 
     pollMyTopAlbums() {
@@ -220,7 +224,7 @@ class LastFmController {
                     that.myTopAlbums = topAlbums;
                 }
             });
-        }, 259200000); // Interval is every month
+        }, 259200000); // Interval is every three days
     }
 }
 
